@@ -61,12 +61,12 @@ df1['Time_taken(min)'] = df1['Time_taken(min)'].astype( int )
 # =========================================================
 # Sidebar bar Streamlit
 # =========================================================
-path = '/Users/franciscocaetano/Documents/Comunidade DS/data_analysis/image/logo-valuuArtboard 2.png'
+path = '/Users/franciscocaetano/Documents/Comunidade DS/data_analysis/image/Asset 1trabsparent.png'
 image = Image.open(path)
-st.sidebar.image(image, width=120)
+st.sidebar.image(image, width=50)
 st.header('Marketplace - Client')
 st.sidebar.markdown('# Cury Company')
-st.sidebar.markdown('## Fastest Devilvery in Town')
+st.sidebar.markdown('### Fastest Devilvery in Town')
 st.sidebar.markdown("""-------------------------""")
 
 
