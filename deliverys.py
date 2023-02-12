@@ -90,6 +90,16 @@ st.sidebar.markdown("""-------------------------""")
 st.sidebar.markdown('##### Powered by Francisco Caetano')
 
 
+
+# Date filters 
+selected_lines = df1['Order_Date'] < date_slider
+df1 = df1.loc[selected_lines, :]
+
+
+# Date trafic options 
+selected_lines = df1['Road_traffic_density'].isin(trafic_options)
+df1 = df1.loc[selected_lines, :]
+#st.dataframe(df1)
 # =========================================================
 # Layout Streamlit
 # =========================================================
@@ -99,7 +109,7 @@ with tab1:
 
     with st.container():
         
-        st.subheader('Overall Metrics')
+        st.markdown('##### Overall Metrics')
         col1, col2,col3,col4 = st.columns(4, gap = 'large')
         with col1:
             max_age = df1.loc[:, 'Delivery_person_Age'].max()
@@ -108,11 +118,11 @@ with tab1:
             min_age =  df1.loc[:, 'Delivery_person_Age'].min()
             col2.metric('Min age', min_age )
         with col3:
-            better_condition = df1.loc[:, 'Vehicle_condition'].max
+            better_condition = df1.loc[:, 'Vehicle_condition'].max()
             col3.metric('Better Condition', better_condition )
-        # with col4:
-        #     worse_condition =  df1.loc[:, 'Vehicle_condition'].min()
-        #     col4.metric('Better Condition', worse_condition )
+        with col4:
+            worse_condition =  df1.loc[:, 'Vehicle_condition'].min()
+            col4.metric('Better Condition', worse_condition )
     with st.container():
         st.markdown("""---""")
         st.title('Avaliations')
@@ -120,10 +130,47 @@ with tab1:
 
         col1,col2 = st.columns(2)
         with col1:
-            st.subheader('Average rate per delivery')
+            st .markdown('##### Average rate per delivery')
+            df_average_rating_per_deliver = (df1.loc[:, ['Delivery_person_ID', 'Delivery_person_Ratings']]
+                                            .groupby(['Delivery_person_ID'])
+                                            .mean()
+                                            .reset_index())
+            st.dataframe(df_average_rating_per_deliver)
         with col2:
-            st.subheader('Average rate per traffic')
-            st.subheader('Average rate per day')
+            st.markdown('##### Average rate per traffic')
+            #using one line
+            #df_average_rating_by_trafic = df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]].groupby(['Road_traffic_density']).agg({'Delivery_person_Ratings':['mean','std']})
+
+            #using two lines
+            df_avg_std_by_trafic = (df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]]
+                                        .groupby(['Road_traffic_density'])
+                                        .agg({'Delivery_person_Ratings':['mean','std']}))
+
+            #df_std_rating_by_trafic = df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]].groupby(['Road_traffic_density']).std().reset_index()
+            # Manipulation dataframe column name
+            df_avg_std_by_trafic.columns = ['delivery_mean', 'delivery_std']
+            # Manipulation dataframe format
+
+            df_avg_std_by_trafic=df_avg_std_by_trafic.reset_index()
+            st.dataframe(df_avg_std_by_trafic)
+
+
+            st.markdown('##### Average rate per weather')
+                        #using one line
+            #df_average_rating_by_trafic = df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]].groupby(['Road_traffic_density']).agg({'Delivery_person_Ratings':['mean','std']})
+
+            #using two lines
+            df_avg_std_by_trafic = (df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]]
+                                        .groupby(['Road_traffic_density'])
+                                        .agg({'Delivery_person_Ratings':['mean','std']}))
+
+            #df_std_rating_by_trafic = df1.loc[:, ['Delivery_person_Ratings','Road_traffic_density' ]].groupby(['Road_traffic_density']).std().reset_index()
+
+            # Manipulation dataframe column name
+            df_avg_std_by_trafic.columns = ['delivery_mean', 'delivery_std']
+            # Manipulation dataframe format
+
+            st.dataframe(df_avg_std_by_trafic)
     
 
     with st.container():
@@ -133,10 +180,33 @@ with tab1:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader('Fastest Deliverys')
+            st.markdown('##### Top Fastest Deliverys')
+            df2 = (df1.loc[:, ['Delivery_person_ID', 'Time_taken(min)', 'City']]
+                    .groupby(['City', 'Delivery_person_ID'])
+                    .median()
+                    .sort_values(['Time_taken(min)', 'City'], ascending = False).reset_index())
+
+            df_aux01 = df2.loc[df2['City'] == 'Metropolitian', : ].head(10)
+            df_aux02 = df2.loc[df2['City'] == 'Urban', : ].head(10)
+            df_aux03  = df2.loc[df2['City'] == 'Semi-Urban', : ].head(10)
+
+            df3 = pd.concat([df_aux01,df_aux02,df_aux03]).reset_index(drop = True)
+            st.dataframe(df3)
+
         
         with col2:
-            st.subheader('Slower Deliverys')
+            st.markdown('##### Slower Deliverys')
+            df2 = (df1.loc[:, ['Delivery_person_ID', 'Time_taken(min)', 'City']]
+                    .groupby(['City', 'Delivery_person_ID'])
+                    .mean()
+                    .sort_values(['Time_taken(min)', 'City'], ascending = True).reset_index())
+
+            df_aux01 = df2.loc[df2['City'] == 'Metropolitian', : ].head(10)
+            df_aux02 = df2.loc[df2['City'] == 'Urban', : ].head(10)
+            df_aux03 = df2.loc[df2['City'] == 'Semi-Urban', : ].head(10)
+
+            df3 = pd.concat([df_aux01,df_aux02,df_aux03]).reset_index(drop = True)
+            st.dataframe(df3)
 
 
 

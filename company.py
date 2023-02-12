@@ -102,8 +102,7 @@ df1 = df1.loc[selected_lines, :]
 # =========================================================
 # Layout Streamlit
 # =========================================================
-tab1, tab2, tab3 = st.tabs(['Management', 'Tactic','Geographic'])
-
+ 
 with tab1:
     st.markdown('# Orders by Day')
     # Order Metric
